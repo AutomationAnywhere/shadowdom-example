@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Counter</title>
+    <script
+      src="https://unpkg.com/htmx.org@2.0.3"
+      integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="p-8">
+    <div>
+      <h1 class="text-3xl font-bold underline">Document Object Model</h1>
+      <div class="py-4" id="counter">Count: <span id="count">0</span></div>
+      <button
+        hx-on:click="increment()"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        Increment
+      </button>
+    </div>
+
+    <div class="py-8">
+      <h1 class="text-3xl font-bold underline">Shadow DOM</h1>
+      <shadow-counter></shadow-counter>
+    </div>
+
+    <script>
+      let count = 0;
+      function increment() {
+        count++;
+        document.getElementById("count").innerText = count;
+      }
+
+      class ShadowCounter extends HTMLElement {
+        constructor() {
+          super();
+          const shadow = this.attachShadow({ mode: "open" });
+          const template = document.createElement("template");
+          template.innerHTML = `
+            <style>
+              [role="button"], button {
+                  cursor: pointer;
+              }
+              .py-2 {
+                  padding-top: 0.5rem;
+                  padding-bottom: 0.5rem;
+              }
+              .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+              .px-4 {
+                  padding-left: 1rem;
+                  padding-right: 1rem;
+              }
+              .rounded {
+                  border-radius: 0.25rem;
+              }
+              .bg-green-500 {
+                --tw-bg-opacity: 1;
+                background-color: rgba(16, 185, 129, var(--tw-bg-opacity));
+              }
+              .bg-green-500:hover {
+                --tw-bg-opacity: 1;
+                background-color: rgba(4, 120, 87, var(--tw-bg-opacity));
+              }
+              .font-bold {
+                  font-weight: 700;
+              }
+              *, ::after, ::before {
+                  box-sizing: border-box;
+                  border-width: 0;
+                  border-style: solid;
+                  border-color: #e5e7eb;
+              }
+              button, input:where([type="button"]), input:where([type="reset"]), input:where([type="submit"]) {
+                  -webkit-appearance: button;
+                  background-color: transparent;
+                  background-image: none;
+              }
+              button, select {
+                  text-transform: none;
+              }
+              button, input, optgroup, select, textarea {
+                font-family: inherit;
+                font-feature-settings: inherit;
+                font-variation-settings: inherit;
+                font-size: 100%;
+                font-weight: inherit;
+                line-height: inherit;
+                letter-spacing: inherit;
+                color: inherit;
+                margin: 0;
+                padding: 0;
+            }
+            .text-white {
+                --tw-text-opacity: 1;
+                color: rgb(255 255 255 / var(--tw-text-opacity));
+            }
+            </style>
+            <div class="py-4" id="counter">
+              Count: <span id="count_shadow">0</span>
+            </div>
+            <button class="bg-green-500 text-white font-bold py-2 px-4 rounded">Increment</button>
+          `;
+          shadow.appendChild(template.content.cloneNode(true));
+
+          this.count = 0;
+          this.countElement = shadow.getElementById("count_shadow");
+          this.button = shadow.querySelector("button");
+          this.button.addEventListener("click", () => this.increment());
+        }
+
+        increment() {
+          this.count++;
+          this.countElement.innerText = this.count;
+        }
+      }
+
+      customElements.define("shadow-counter", ShadowCounter);
+    </script>
+  </body>
+</html>
